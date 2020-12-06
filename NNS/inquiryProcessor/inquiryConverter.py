@@ -2,6 +2,10 @@
 import spacy
 import numpy as np
 
+"""
+Converts the inquiry(string) to embeddings from spacy(will be changed to pytorch embeddings soon)
+"""
+
 
 class InquiryConverter:
     _dictionary = None
@@ -20,6 +24,11 @@ class InquiryConverter:
             arrays[i] = array.astype(dtype=np.double)
             i += 1
         return arrays
+
+
+"""
+Converts an array of inquiries to embeddings(the same as InquiryConverter)
+"""
 
 
 class InquiryArrayConverter:
@@ -50,6 +59,9 @@ class InquiryArrayConverter:
 
 
 # this class has got to return the vectors of all words(currently only English words)
+"""
+Manages dictionaries for creating embeddings from spacy library.
+"""
 class WordsDictionary:
     @staticmethod
     def getWordsDictionary(language="en"):

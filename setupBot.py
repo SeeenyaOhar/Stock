@@ -14,6 +14,11 @@ from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer, InquiryDatase
 
 
 def labelsNumpy(array):
+    """
+    Converts a list to a numpy array with labels.
+    :param array: A list to be converted.
+    :return: A numpy array with labels.
+    """
     result = np.zeros((len(array), 10))
     for n, i in enumerate(array):
         nparray = np.array(i)
@@ -22,6 +27,10 @@ def labelsNumpy(array):
 
 
 def packSequence(sequence):
+    """
+    Pads and packs sequence.
+    :param sequence: A sequence of list type.
+    """
     a = setupSequence(sequence)
     lengths = [len(i) for i in a]
 
@@ -31,22 +40,27 @@ def packSequence(sequence):
 
 
 def setupSequence(sequence):
+    """
+    Processes sequence to an appropriate form for the neural network.
+    :param sequence: A sequence of list type.
+    :return: A processed sequence.
+    """
     result = sequence.copy()
     for n, i in enumerate(sequence):
         result[n] = torch.from_numpy(sequence[n])
     return result
 
-
-inquiry = InquiryConverter("Hello World").convertTonpArray()
-inquiry = torch.from_numpy(inquiry).type(torch.double)
-anal = InquiryAnalyzer().double()
+# initializing an analyzer
+anal = InquiryAnalyzer(True)
+# assigning epochs
 epochs = 1000
+# getting dataset
 np_training_dataset = InquiryDataset.getTrainingDataset()
+# splitting data and converting to a right form
 training_dataset = np_training_dataset
 training_input = packSequence(InquiryArrayConverter(np_training_dataset[:, 0],
                                                     language="en").convertToNumpyNumbers())  # getting the first axis which is the input
 np_labels = labelsNumpy(np_training_dataset[:, 1])
 training_labels = torch.from_numpy(np_labels).double()  # getting the second axis(the labels for the input given)
-
-result = anal.trainData(training_input, training_labels)
-print(result)
+# training data
+result = anal.trainData(training_input, training_labels, epochs)
