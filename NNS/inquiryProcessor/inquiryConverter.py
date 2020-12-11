@@ -2,12 +2,17 @@
 import spacy
 import numpy as np
 
-"""
-Converts the inquiry(string) to embeddings from spacy(will be changed to pytorch embeddings soon)
-"""
 
+def cleanUpTheInquiry(inquiry : str):
+    removeCharacters = [".", ",", "+", "-", "=", ":", "-", "?", "!"]
+    for i in removeCharacters:
+        inquiry.replace(i, "")
+    return inquiry
 
 class InquiryConverter:
+    """
+    Converts the inquiry(string) to embeddings from spacy(will be changed to pytorch embeddings soon)
+    """
     _dictionary = None
 
     def __init__(self, inquiry, language="en"):
@@ -19,19 +24,19 @@ class InquiryConverter:
     def convertTonpArray(self) -> np.array:
         arrays = np.zeros((len(self.words), 300), dtype=np.double)
         i = 0
-        for word in self.words:
+        for curWord in self.words:
+            word = cleanUpTheInquiry(curWord)
             array = np.array(InquiryConverter._dictionary.vocab[word].vector)
             arrays[i] = array.astype(dtype=np.double)
             i += 1
         return arrays
 
 
-"""
-Converts an array of inquiries to embeddings(the same as InquiryConverter)
-"""
-
 
 class InquiryArrayConverter:
+    """
+    Converts an array of inquiries to embeddings(the same as InquiryConverter)
+    """
     _dictionary = None
 
     def __init__(self, inquiries, language="en"):  # We're passing in the numpy array with the inquiries given
@@ -59,16 +64,17 @@ class InquiryArrayConverter:
 
 
 # this class has got to return the vectors of all words(currently only English words)
-"""
-Manages dictionaries for creating embeddings from spacy library.
-"""
+
 class WordsDictionary:
+    """
+    Manages dictionaries for creating embeddings from spacy library.
+    """
     @staticmethod
     def getWordsDictionary(language="en"):
         packageName = ""
         # English
         if language == "en":
-            packageName = "en_core_web_md";
+            packageName = "en_core_web_lg"
 
         if packageName == "":
             raise ValueError("Language as such was not found.")

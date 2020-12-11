@@ -36,7 +36,7 @@ def packSequence(sequence):
 
     b = utils.pad_sequence(a, batch_first=True)
 
-    return utils.pack_padded_sequence(b, batch_first=True, lengths=lengths, enforce_sorted=False).double()
+    return utils.pack_padded_sequence(b, batch_first=True, lengths=lengths, enforce_sorted=False)
 
 
 def setupSequence(sequence):
@@ -61,6 +61,6 @@ training_dataset = np_training_dataset
 training_input = packSequence(InquiryArrayConverter(np_training_dataset[:, 0],
                                                     language="en").convertToNumpyNumbers())  # getting the first axis which is the input
 np_labels = labelsNumpy(np_training_dataset[:, 1])
-training_labels = torch.from_numpy(np_labels).double()  # getting the second axis(the labels for the input given)
+training_labels = torch.from_numpy(np_labels)  # getting the second axis(the labels for the input given)
 # training data
 result = anal.trainData(training_input, training_labels, epochs)
