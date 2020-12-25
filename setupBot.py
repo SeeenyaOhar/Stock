@@ -10,7 +10,8 @@ import torch
 import torch.nn.utils.rnn as utils
 import numpy as np
 from NNS.inquiryProcessor.inquiryConverter import InquiryConverter, InquiryArrayConverter
-from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer, InquiryDataset
+from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer
+from NNS.inquiryProcessor.dataset import InquiryDataset
 
 
 def labelsNumpy(array):
@@ -52,6 +53,7 @@ def setupSequence(sequence):
 
 # initializing an analyzer
 anal = InquiryAnalyzer(True)
+anal.load("C:\\Users\\senya\\Desktop\\mmm.weights")
 # assigning epochs
 epochs = 1000
 # getting dataset
@@ -59,8 +61,10 @@ np_training_dataset = InquiryDataset.getTrainingDataset()
 # splitting data and converting to a right form
 training_dataset = np_training_dataset
 training_input = packSequence(InquiryArrayConverter(np_training_dataset[:, 0],
-                                                    language="en").convertToNumpyNumbers())  # getting the first axis which is the input
+                                                    language="en").convertToNumpyNumbers())
+                                                                                              # getting the first axis which is the input
 np_labels = labelsNumpy(np_training_dataset[:, 1])
 training_labels = torch.from_numpy(np_labels)  # getting the second axis(the labels for the input given)
 # training data
 result = anal.trainData(training_input, training_labels, epochs)
+anal.save("C:\\Users\\senya\\Desktop\\mmm.weights")

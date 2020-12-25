@@ -4,9 +4,17 @@ import numpy as np
 
 
 def cleanUpTheInquiry(inquiry : str):
+    """Cleans the inqury from some redundant characters(,.!? and so on)
+
+    Args:
+        inquiry (str): The inquiry.
+
+    Returns:
+        (str): The cleaned inquiry.
+    """
     removeCharacters = [".", ",", "+", "-", "=", ":", "-", "?", "!"]
     for i in removeCharacters:
-        inquiry.replace(i, "")
+        inquiry = inquiry.replace(i, "")
     return inquiry
 
 class InquiryConverter:
@@ -53,9 +61,11 @@ class InquiryArrayConverter:
 
         for i in self.inquiries:
             words = i.split(" ")
+            
             wordsNumpyArray = np.zeros((len(words), 300), dtype=np.double)
             i = 0
-            for word in words:
+            for curWord in words:
+                word = cleanUpTheInquiry(curWord)
                 array = np.array(InquiryArrayConverter._dictionary.vocab[word].vector)
                 wordsNumpyArray[i] = array.astype(dtype=np.double)
                 i += 1
