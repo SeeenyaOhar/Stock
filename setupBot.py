@@ -27,44 +27,37 @@ def labelsNumpy(array):
     return result
 
 
-def packSequence(sequence):
-    """
-    Pads and packs sequence.
-    :param sequence: A sequence of list type.
-    """
-    a = setupSequence(sequence)
-    lengths = [len(i) for i in a]
+def train(anal):
+    # assigning epochs
+    epochs = 1000
+    # getting dataset
+    np_training_dataset = InquiryDataset.getTrainingDataset()
+    # splitting data and converting to a right form
+    training_dataset = np_training_dataset
+    training_input = anal.packSequence(InquiryArrayConverter(np_training_dataset[:, 0],
+                                                             language="en").convertToNumpyNumbers())
+    # getting the first axis which is the input
+    np_labels = labelsNumpy(np_training_dataset[:, 1])
+    # getting the second axis(the labels for the input given)
+    training_labels = torch.from_numpy(np_labels)
+    # training data
+    result = anal.trainData(training_input, training_labels, epochs)
+    anal.save("C:\\Users\\senya\\Desktop\\mmm.weights")
 
-    b = utils.pad_sequence(a, batch_first=True)
-
-    return utils.pack_padded_sequence(b, batch_first=True, lengths=lengths, enforce_sorted=False)
-
-
-def setupSequence(sequence):
-    """
-    Processes sequence to an appropriate form for the neural network.
-    :param sequence: A sequence of list type.
-    :return: A processed sequence.
-    """
-    result = sequence.copy()
-    for n, i in enumerate(sequence):
-        result[n] = torch.from_numpy(sequence[n])
-    return result
 
 # initializing an analyzer
 anal = InquiryAnalyzer(True)
 anal.load("C:\\Users\\senya\\Desktop\\mmm.weights")
-# assigning epochs
-epochs = 1000
-# getting dataset
 np_training_dataset = InquiryDataset.getTrainingDataset()
 # splitting data and converting to a right form
 training_dataset = np_training_dataset
-training_input = packSequence(InquiryArrayConverter(np_training_dataset[:, 0],
-                                                    language="en").convertToNumpyNumbers())
-                                                                                              # getting the first axis which is the input
-np_labels = labelsNumpy(np_training_dataset[:, 1])
-training_labels = torch.from_numpy(np_labels)  # getting the second axis(the labels for the input given)
-# training data
-result = anal.trainData(training_input, training_labels, epochs)
-anal.save("C:\\Users\\senya\\Desktop\\mmm.weights")
+training_input = anal.packSequence(
+    InquiryArrayConverter(["Hi, how many cores does IPhone's processor have?",
+                           "Hey, i need a phone for "
+                           "my parent asap. It has to be cheap "
+                           "and fast.",
+                           "Hi, what's the phone number?", "How much does it cost to deliver to Juliet?",
+                           "I need a red dress for a party. Do you have one?",],
+                          language="en").convertToNumpyNumbers())
+anal.eval()
+print(str(anal.forward(training_input, cellStateSize=len(training_input.sorted_indices)).float().round()))

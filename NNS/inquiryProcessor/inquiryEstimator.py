@@ -12,9 +12,6 @@ import curses as curses
 import matplotlib.pyplot as plt
 
 
-
-
-
 class InquiryAnalyzer(nn.Module):
     """
     Basically, neural network that classifies the inquiry embeddings based on the context.
@@ -29,10 +26,38 @@ class InquiryAnalyzer(nn.Module):
         if terminalUI:
             self.epochScr = curses.initscr()
         self.l1 = torch.nn.Linear(300, 100)
-        self.l2 = torch.nn.Linear(100, 50)
-        self.lstm = torch.nn.LSTM(50, 20, 20)
+        self.lstm = torch.nn.LSTM(100, 20, 2)
+        self.l2 = torch.nn.Linear(20, 20)
         self.softmax = torch.nn.Linear(20, 10)
         self.float()
+
+    def packSequence(self, sequence):
+        """
+            Pads and packs sequence.
+                    :param sequence: A sequence of list type
+        Args:
+            sequence (list): A sequence.
+
+        Returns:
+            [PackPaddedSequence]: Packed padded sequence.
+        """
+        a = self.setupSequence(sequence)
+        lengths = [len(i) for i in a]
+
+        b = utils.pad_sequence(a, batch_first=True)
+
+        return utils.pack_padded_sequence(b, batch_first=True, lengths=lengths, enforce_sorted=False).float()
+
+    def setupSequence(self, sequence):
+        """
+        Processes sequence to an appropriate form for the neural network.
+        :param sequence: A sequence of list type.
+        :return: A processed sequence.
+        """
+        result = sequence.copy()
+        for n, i in enumerate(sequence):
+            result[n] = torch.from_numpy(sequence[n])
+        return result
 
     def forward(self, x, cellStateSize=1):
         """
@@ -43,29 +68,41 @@ class InquiryAnalyzer(nn.Module):
         assert (isinstance(x, torch.nn.utils.rnn.PackedSequence))
 
         # x here is the inquiry
-        cell_state = torch.zeros(20, cellStateSize, 20)  # check the correctness of the size
-        hidden_state = torch.zeros(20, cellStateSize, 20)  # check the correctness of the size
+        # check the correctness of the size
+        cell_state = torch.zeros(2, cellStateSize, 20)
+        # check the correctness of the size
+        hidden_state = torch.zeros(2, cellStateSize, 20)
         # Checking if all of the elements of array x(which is an inquiry basically)
         result = None
         # going through every word
 
         if x.data[0].shape[0] != 300:
-            raise ValueError("The size of x has to be 300(vector features of the word)")
+            raise ValueError(
+                "The size of x has to be 300(vector features of the word)")
         else:
             currentInput = x
             # (1) Densed layer(shrinking down)
-            currentInput = PackedSequenceHelper.squash_packed(currentInput, self.l1)
-            # currentInput = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput, )
+            currentInput = PackedSequenceHelper.squash_packed(
+                currentInput, self.l1)
+            #currentInput = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput, )
             currentInput = PackedSequenceHelper.squash_packed(currentInput)
             # (2) Densed layer(shrinking down even more)
-            currentInput = PackedSequenceHelper.squash_packed(currentInput, self.l2)
-            currentInput = PackedSequenceHelper.squash_packed(currentInput)
+            # currentInput = PackedSequenceHelper.squash_packed(
+                # currentInput, self.l2)
+            # currentInput = PackedSequenceHelper.squash_packed(currentInput)
             # currentInput = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput)
             # (3) LSTM Layer - based on the hidden state and cell state we predict what does the sentence mean
             # In other words, what kind of inquiry user has made
+
+
             (out, h0) = self.lstm(currentInput, (hidden_state, cell_state))
-            result = out
             hidden_state = h0
+            currentInput = out
+
+            currentInput = PackedSequenceHelper.squash_packed(
+                currentInput, self.l2)
+            result = PackedSequenceHelper.squash_packed(currentInput)
+
 
         # (4) - Softmax layer(output layer) | Classifying the inquiry
         result = PackedSequenceHelper.squash_packed(result, self.softmax)
@@ -82,6 +119,7 @@ class InquiryAnalyzer(nn.Module):
         """
         assert (isinstance(x, torch.nn.utils.rnn.PackedSequence))
         assert (isinstance(y, torch.Tensor))
+        self.train()
         # assert(isinstance(y, torch.Tensor))
         # assert(isinstance(epochs, int))
         # optimizer = optim.SGD(self.parameters(), lr=0.01, momentum=0.9)
@@ -96,7 +134,8 @@ class InquiryAnalyzer(nn.Module):
             #     batchSize = n
             #     dataBatchEnd = dataBatchStartIndex + batchSize
             #     currentBatch = x.data[dataBatchStartIndex:dataBatchEnd]
-            output = self.forward(x.float(), cellStateSize=len(x.sorted_indices))
+            output = self.forward(
+                x.float(), cellStateSize=len(x.sorted_indices))
             loss_value = error(output, y.float())
             self._changeAccuracy(loss_value)
             loss_value.backward()
@@ -116,7 +155,6 @@ class InquiryAnalyzer(nn.Module):
         plt.plot(losses)
         plt.ylabel("losses")
         plt.show()
-
 
     def _sequenceLabels(self, packed):
         """
@@ -158,7 +196,7 @@ class InquiryAnalyzer(nn.Module):
         """
         Saves the models dictionary(state_dict) to the path file.
         """
-        try: 
+        try:
             torch.save(self.state_dict(), path)
             print("The model has been saved to {0}".format(path))
         except Exception as e:
@@ -175,8 +213,8 @@ class InquiryAnalyzer(nn.Module):
             print("The model has been loaded with {0}".format(path))
         except Exception as e:
             print(str(e))
-        
-        
+
+
 class PackedSequenceHelper:
     @staticmethod
     def squash_packed(x, fn=torch.tanh):
