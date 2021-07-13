@@ -26,8 +26,9 @@ class InquiryAnalyzer(nn.Module):
         if terminalUI:
             self.epochScr = curses.initscr()
         self.l1 = torch.nn.Linear(300, 100)
-        self.lstm = torch.nn.LSTM(100, 20, 2)
-        self.l2 = torch.nn.Linear(20, 20)
+        self.l12 = torch.nn.Linear(100, 50)
+        self.lstm = torch.nn.LSTM(50, 25, 3)
+        self.l2 = torch.nn.Linear(25, 20)
         self.softmax = torch.nn.Linear(20, 10)
         self.float()
 
@@ -69,9 +70,9 @@ class InquiryAnalyzer(nn.Module):
 
         # x here is the inquiry
         # check the correctness of the size
-        cell_state = torch.zeros(2, cellStateSize, 20)
+        cell_state = torch.zeros(3, cellStateSize, 25)
         # check the correctness of the size
-        hidden_state = torch.zeros(2, cellStateSize, 20)
+        hidden_state = torch.zeros(3, cellStateSize, 25)
         # Checking if all of the elements of array x(which is an inquiry basically)
         result = None
         # going through every word
@@ -84,13 +85,13 @@ class InquiryAnalyzer(nn.Module):
             # (1) Densed layer(shrinking down)
             currentInput = PackedSequenceHelper.squash_packed(
                 currentInput, self.l1)
-            #currentInput = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput, )
-            currentInput = PackedSequenceHelper.squash_packed(currentInput)
-            # (2) Densed layer(shrinking down even more)
-            # currentInput = PackedSequenceHelper.squash_packed(
-                # currentInput, self.l2)
+            currentInput = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput, )
             # currentInput = PackedSequenceHelper.squash_packed(currentInput)
-            # currentInput = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput)
+            # (2) Densed layer(shrinking down even more)
+            currentInput = PackedSequenceHelper.squash_packed(
+                currentInput, self.l12)
+            # currentInput = PackedSequenceHelper.squash_packed(currentInput)
+            currentInput = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput)
             # (3) LSTM Layer - based on the hidden state and cell state we predict what does the sentence mean
             # In other words, what kind of inquiry user has made
 
@@ -101,7 +102,8 @@ class InquiryAnalyzer(nn.Module):
 
             currentInput = PackedSequenceHelper.squash_packed(
                 currentInput, self.l2)
-            result = PackedSequenceHelper.squash_packed(currentInput)
+            # result = PackedSequenceHelper.squash_packed(currentInput)
+            result = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput)
 
 
         # (4) - Softmax layer(output layer) | Classifying the inquiry
@@ -149,11 +151,13 @@ class InquiryAnalyzer(nn.Module):
         loss_value.backward()
         optimizer.step()
         self.epochScr.erase()
-        print("Final result: {0}".format(output.float()))
+        print("Final result: {0}".format(output.float().round()))
         print("\nLoss: {0}".format(loss_value.float()))
         self.epochScr.refresh()
         plt.plot(losses)
-        plt.ylabel("losses")
+        plt.ylabel("Losses")
+        plt.xlabel("Epoch")
+        plt.title("Losses over {0} epochs".format(epochs))
         plt.show()
 
     def _sequenceLabels(self, packed):
@@ -241,7 +245,7 @@ class PackedSequenceHelper:
 
 class PackedSequenceLeakyReluHelper:
     @staticmethod
-    def squash_packed_relu(x, slope=0.1):
+    def squash_packed_relu(x, slope=0.7):
         """
         Squashes the PackedSequence with Leaky Relu Function.
         :param x: The PackedSequence whose data we process with Leaky Relu.

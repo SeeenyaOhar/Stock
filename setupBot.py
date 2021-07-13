@@ -27,9 +27,9 @@ def labelsNumpy(array):
     return result
 
 
-def train(anal):
+def train(anal, epochs=1000):
     # assigning epochs
-    epochs = 1000
+    anal.load("C:\\Users\\senya\\Desktop\\mmm.weights")
     # getting dataset
     np_training_dataset = InquiryDataset.getTrainingDataset()
     # splitting data and converting to a right form
@@ -45,19 +45,29 @@ def train(anal):
     anal.save("C:\\Users\\senya\\Desktop\\mmm.weights")
 
 
+def test(anal):
+    anal.load("C:\\Users\\senya\\Desktop\\mmm.weights")
+    np_training_dataset = InquiryDataset.getTrainingDataset()
+    # splitting data and converting to a right form
+    training_dataset = np_training_dataset
+    v = np_training_dataset[0:3, 0].tolist()
+    v2 = np_training_dataset[-3:-1, 0].tolist()
+    sample = v + v2 + [np_training_dataset[-1, 0]]
+    y = np_training_dataset[0:3, 1].tolist() + np_training_dataset[-3:-1, 1].tolist() + [np_training_dataset[-1, 1]]
+    training_input = anal.packSequence(
+        InquiryArrayConverter(sample,
+                              language="en").convertToNumpyNumbers())
+    anal.eval()
+    result = str(anal.forward(training_input, cellStateSize=len(
+        training_input.sorted_indices)).round())
+    
+    print("Sample: {0} \n Y: {1}\nResult: {2}".format(sample, y , result) )
+
+
+
 # initializing an analyzer
 anal = InquiryAnalyzer(True)
-anal.load("C:\\Users\\senya\\Desktop\\mmm.weights")
-np_training_dataset = InquiryDataset.getTrainingDataset()
-# splitting data and converting to a right form
-training_dataset = np_training_dataset
-training_input = anal.packSequence(
-    InquiryArrayConverter(["Hi, how many cores does IPhone's processor have?",
-                           "Hey, i need a phone for "
-                           "my parent asap. It has to be cheap "
-                           "and fast.",
-                           "Hi, what's the phone number?", "How much does it cost to deliver to Juliet?",
-                           "I need a red dress for a party. Do you have one?",],
-                          language="en").convertToNumpyNumbers())
-anal.eval()
-print(str(anal.forward(training_input, cellStateSize=len(training_input.sorted_indices)).float().round()))
+
+torch.device("cuda")
+train(anal, epochs=600)
+# train(anal, epochs=100)
