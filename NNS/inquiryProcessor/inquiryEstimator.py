@@ -12,7 +12,7 @@ import curses as curses
 import matplotlib.pyplot as plt
 
 
-class InquiryAnalyzer(nn.Module):
+class InquiryAnalyzerRNN(nn.Module):
     """
     Basically, neural network that classifies the inquiry embeddings based on the context.
     """
@@ -20,7 +20,7 @@ class InquiryAnalyzer(nn.Module):
     # Initializing model here
     def __init__(self, terminalUI=False):
         # init the super of pytorch neural network
-        super(InquiryAnalyzer, self).__init__()
+        super(InquiryAnalyzerRNN, self).__init__()
         # Shrinking down the data
         # Or in other words cutting down the data we don't need
         if terminalUI:
@@ -95,18 +95,16 @@ class InquiryAnalyzer(nn.Module):
             # (3) LSTM Layer - based on the hidden state and cell state we predict what does the sentence mean
             # In other words, what kind of inquiry user has made
 
-
             (out, h0) = self.lstm(currentInput, (hidden_state, cell_state))
             hidden_state = h0
             currentInput = out
-
+            # (4) Linear Layer(shrink down from 25 to 20)
             currentInput = PackedSequenceHelper.squash_packed(
                 currentInput, self.l2)
             # result = PackedSequenceHelper.squash_packed(currentInput)
             result = PackedSequenceLeakyReluHelper.squash_packed_relu(currentInput)
 
-
-        # (4) - Softmax layer(output layer) | Classifying the inquiry
+        # (5) - Softmax layer(output layer) | Classifying the inquiry
         result = PackedSequenceHelper.squash_packed(result, self.softmax)
         result = PackedSequenceHelper.squash_packed_softmax(result, dim=1)
         return self._sequenceLabels(result)
@@ -125,8 +123,8 @@ class InquiryAnalyzer(nn.Module):
         # assert(isinstance(y, torch.Tensor))
         # assert(isinstance(epochs, int))
         # optimizer = optim.SGD(self.parameters(), lr=0.01, momentum=0.9)
-        optimizer = optim.Adam(self.parameters())
-        error = torch.nn.MSELoss()
+        optimizer = optim.Adam(self.parameters())  # WE USE ADAM
+        error = torch.nn.MSELoss()  # AND WE USE MSELoss for the algorithm
         losses = []
         for i in range(epochs):
             self._changeEpoch(i)
@@ -142,7 +140,7 @@ class InquiryAnalyzer(nn.Module):
             self._changeAccuracy(loss_value)
             loss_value.backward()
             optimizer.step()
-            losses.append(loss_value)
+            losses.append(loss_value.detach().numpy())
 
         optimizer.zero_grad()
         output = self.forward(x.float(), cellStateSize=len(x.sorted_indices))
@@ -217,6 +215,22 @@ class InquiryAnalyzer(nn.Module):
             print("The model has been loaded with {0}".format(path))
         except Exception as e:
             print(str(e))
+
+
+class InquiryAnalyzerSVM(nn.Module):
+    def __init__(self):
+        # init the super of pytorch neural network
+        super(InquiryAnalyzerSVM, self).__init__()
+        self.w = nn.Parameter(torch.randn(300), requires_grad=True)
+        self.b = nn.Parameter(torch.randn(1), requires_grad=True)
+
+    def forward(self, x):
+        h = x.matmul(self.w.t())
+        return h
+
+    @staticmethod
+    def hinge_loss(y_pred, y_true):
+        return torch.mean(torch.clamp(1 - y_pred.t() * y_true, min=0))
 
 
 class PackedSequenceHelper:

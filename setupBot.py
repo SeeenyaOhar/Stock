@@ -1,73 +1,36 @@
 # THIS IS A SCRIPT TO CREATE A JSON FILE FOR A BOT
 
 # THE JSON FILE SHOULD CONTAIN:
-# 1. A NAME OF THE BOT
+# 0. an ID of THE BOT
+# 1. A NAME THE BOT
 # 2. A DESCRIPTION OF THE BOT
 # 3. PHONE NUMBERS TO CONTACT THE COMPANY THAT SELLS THE PRODUCTS
 # 4. A WEBSITE/SOCIAL NETWORK PROFILE WHERE THE ITEMS ARE SOLD
 import os
-import torch
-import torch.nn.utils.rnn as utils
-import numpy as np
-from NNS.inquiryProcessor.inquiryConverter import InquiryConverter, InquiryArrayConverter
-from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer
-from NNS.inquiryProcessor.dataset import InquiryDataset
+import phonenumbers
+import pymongo
+
+from bot import Bot
 
 
-def labelsNumpy(array):
+class BotCreator:
     """
-    Converts a list to a numpy array with labels.
-    :param array: A list to be converted.
-    :return: A numpy array with labels.
+    BotCreator is used to create a bot and post it to the database, set it up and more.
     """
-    result = np.zeros((len(array), 10))
-    for n, i in enumerate(array):
-        nparray = np.array(i)
-        result[n] = nparray
-    return result
+    def __init__(self, name: str, description: str, phone_number: phonenumbers.PhoneNumber, resource_url: str):
+        """
+        Creates a BotCreator object.
+        :param name: A name of the bot.
+        :param description: A description of the bot.
+        :param phone_number:  A phone number the user or the administrator of Stock can contact the client(a shop)
+        :param resource_url: A link to the client(shop).
+        """
+        assert (type(name) == str)
+        assert (type(description) == str)
+        assert (type(phone_number) == phonenumbers.PhoneNumber)
+        assert (type(resource_url) == str)
 
+        self.bot = Bot(name, description, phone_number, resource_url)
 
-def train(anal, epochs=1000):
-    # assigning epochs
-    anal.load("C:\\Users\\senya\\Desktop\\mmm.weights")
-    # getting dataset
-    np_training_dataset = InquiryDataset.getTrainingDataset()
-    # splitting data and converting to a right form
-    training_dataset = np_training_dataset
-    training_input = anal.packSequence(InquiryArrayConverter(np_training_dataset[:, 0],
-                                                             language="en").convertToNumpyNumbers())
-    # getting the first axis which is the input
-    np_labels = labelsNumpy(np_training_dataset[:, 1])
-    # getting the second axis(the labels for the input given)
-    training_labels = torch.from_numpy(np_labels)
-    # training data
-    result = anal.trainData(training_input, training_labels, epochs)
-    anal.save("C:\\Users\\senya\\Desktop\\mmm.weights")
-
-
-def test(anal):
-    anal.load("C:\\Users\\senya\\Desktop\\mmm.weights")
-    np_training_dataset = InquiryDataset.getTrainingDataset()
-    # splitting data and converting to a right form
-    training_dataset = np_training_dataset
-    v = np_training_dataset[0:3, 0].tolist()
-    v2 = np_training_dataset[-3:-1, 0].tolist()
-    sample = v + v2 + [np_training_dataset[-1, 0]]
-    y = np_training_dataset[0:3, 1].tolist() + np_training_dataset[-3:-1, 1].tolist() + [np_training_dataset[-1, 1]]
-    training_input = anal.packSequence(
-        InquiryArrayConverter(sample,
-                              language="en").convertToNumpyNumbers())
-    anal.eval()
-    result = str(anal.forward(training_input, cellStateSize=len(
-        training_input.sorted_indices)).round())
-    
-    print("Sample: {0} \n Y: {1}\nResult: {2}".format(sample, y , result) )
-
-
-
-# initializing an analyzer
-anal = InquiryAnalyzer(True)
-
-torch.device("cuda")
-train(anal, epochs=600)
-# train(anal, epochs=100)
+        # connect a db
+        # TODO: USE A MONGO DB

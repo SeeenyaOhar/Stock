@@ -1,0 +1,22 @@
+{
+  "name": "stock",
+  "version": "1.0.0",
+  "description": "Stock - is a an advanced artificial management system for small local business.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SeeenyaOhar/Stock.git"
+  },
+  "keywords": [
+    "AI"
+  ],
+  "author": "Senior",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SeeenyaOhar/Stock/issues"
+  },
+  "homepage": "https://github.com/SeeenyaOhar/Stock#readme"
+}

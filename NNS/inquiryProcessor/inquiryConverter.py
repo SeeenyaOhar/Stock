@@ -20,6 +20,11 @@ def cleanUpTheInquiry(inquiry: str):
 
 
 def cleanCharacters(inquiry):
+    """
+    Removes special symbols that are not valuable to the spacy embeddings.
+    :param inquiry:
+    :return:
+    """
     removeCharacters = [".", ",", "+", "-", "=", ":", "-", "?", "!", '"']
     for i in removeCharacters:
         inquiry = inquiry.replace(i, "")
@@ -27,12 +32,16 @@ def cleanCharacters(inquiry):
 
 
 def cleanContractions(inquiry):
+    """
+    Cleans up the contractions("what's up", "rofl")
+    :param inquiry:
+    :return:
+    """
     contractions = ContractionsJSON()
     contractions.initDictionary()
 
     for contraction in contractions.dictionary:
         if contraction in inquiry:
-            print(contraction)
             replacement = contractions.dictionary[contraction]
             inquiry = inquiry.replace(contraction, replacement)
 
@@ -101,7 +110,7 @@ class InquiryArrayConverter:
         return result
 
 
-# this class has got to return the vectors of all words(currently only English words)
+
 
 class WordsDictionary:
     """
@@ -112,7 +121,7 @@ class WordsDictionary:
         packageName = ""
         # English
         if language == "en":
-            packageName = "en_core_web_lg"
+            packageName = "en_core_web_lg" # we use a large package for the most precision
 
         if packageName == "":
             raise ValueError("Language as such was not found.")

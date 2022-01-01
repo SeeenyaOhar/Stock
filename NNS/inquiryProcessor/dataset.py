@@ -466,8 +466,7 @@ class InquiryDataset:
                          [
                              "Oh, fuck, that ball is so cool. It bounces really well and I dunk all the time. "
                              "It grips really well and seems it won't wear off in the future. Highly recommend!",
-                             InquiryDataset.feedback]
-                         ],
-                        ["I'm looking for a ball for my kid. What would you recommend?", InquiryDataset.recommendation],
+                             InquiryDataset.feedback],
+                        ["I'm looking for a ball for my kid. What would you recommend?", InquiryDataset.recommendation]],
 
                         )
