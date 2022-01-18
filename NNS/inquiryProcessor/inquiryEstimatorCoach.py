@@ -24,7 +24,7 @@ def train(anal, epochs=1000):
     # assigning epochs
     anal.load(ANAL_WEIGHTS_FILEPATH)
     # getting dataset
-    np_training_dataset = InquiryDataset.getTrainingDataset()
+    np_training_dataset = InquiryDataset.get_training_dataset()
     # splitting data and converting to a right form
     training_dataset = np_training_dataset
     training_input = anal.packSequence(InquiryArrayConverter(np_training_dataset[:, 0],
@@ -40,7 +40,7 @@ def train(anal, epochs=1000):
 
 def test(anal):
     anal.load(ANAL_WEIGHTS_FILEPATH)
-    np_training_dataset = InquiryDataset.getTrainingDataset()
+    np_training_dataset = InquiryDataset.get_training_dataset()
     # splitting data and converting to a right form
     training_dataset = np_training_dataset
     v = np_training_dataset[0:3, 0].tolist()
@@ -58,8 +58,8 @@ def test(anal):
 
 
 # initializing an analyzer
-anal = InquiryAnalyzer(True)
+anal = InquiryAnalyzerRNN(True)
 
-torch.device("cuda")
+# torch.device("cuda")
 train(anal, epochs=1000)
 # train(anal, epochs=100)
