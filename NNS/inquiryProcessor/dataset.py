@@ -7,6 +7,7 @@ class InquiryDataset:
     """
     Manages the training datasets.
     """
+    dataset_path = "inquiries_dataset.csv"
     user_interaction_needed = np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     contact = np.array([0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
     dataset_search = np.array([0, 0, 1, 0, 0, 0, 0, 0, 0, 0])
