@@ -1,6 +1,8 @@
 import numpy as np
-
-
+import csv as csv
+import pandas as pd
+import os
+import sys
 class InquiryDataset:
     """
     Manages the training datasets.
@@ -17,16 +19,51 @@ class InquiryDataset:
     recommendation = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
 
     @staticmethod
-    def getTrainingDataset() -> np.ndarray:
+    def get_training_dataset(dataset_path: str) -> np.ndarray:
+        """Reads the numpy training dataset from csv file(located in dataset_path in InquiryDataset class).
+
+        Args:
+            dataset_path (str): A dataset path.
+
+        Returns:
+            np.ndarray: A numpy array dataset.
         """
-        Returns a training dataset [19, 2] that contains inquiries and classifications respectively.
-        :return: Returns a numpy array [19, 2] with inquiries and classifications
+        print(dataset_path)
+        df = pd.read_csv(dataset_path, error_bad_lines=False)
+        dataset = df.to_numpy()
+        dataset = dataset[:, [1, 2]] # in the file we have also ids in zero column, so let's select only labels
+        # and inquiries
+        classes = dataset[:, 1]
+        for i, el in enumerate(classes):
+            classes[i] = InquiryDataset.pandas_csv_real_to_string(el)
+        return dataset
+
+    @staticmethod
+    def pandas_csv_real_to_string(a: str) -> np.ndarray:
         """
+        Pandas numpy array is a string. To convert to numpy array we use this method.
+        Converts '[1 0 1 0 0 0 0 0 0]' to 'array([[1, 0, 1, 0, 0, 0, 0, 0, 0]]'
+        :param a: csv string
+        :return: np.ndarray
+        """
+
+        b = a.split('[')[1].split(']')[0].split(' ')
+        c = np.zeros([1, len(b)])
+        for i, el in enumerate(b):
+            c[0, i] = int(el)
+        return c
+
+    @staticmethod
+    def get_temp_dataset() -> np.ndarray:
+        """
+                Returns a training dataset [*, 2] that contains inquiries and classifications respectively.
+                :return: Returns a numpy array [*, 2] with inquiries and classifications
+                """
         return np.array([["Hi, what's your phone number?", InquiryDataset.contact],
                          ["Hi, may I get the phone number?",
                           InquiryDataset.contact],
                          ["Hi, I want to order this product",
-                          (InquiryDataset.order + InquiryDataset.dataset_search), ],
+                          (InquiryDataset.order + InquiryDataset.dataset_search)],
                          ["Good morning, I'm interested in this product. What's the price of this one?",
                           InquiryDataset.dataset_search],
                          ["Are there any of this product in stock?",
@@ -467,6 +504,11 @@ class InquiryDataset:
                              "Oh, fuck, that ball is so cool. It bounces really well and I dunk all the time. "
                              "It grips really well and seems it won't wear off in the future. Highly recommend!",
                              InquiryDataset.feedback],
-                        ["I'm looking for a ball for my kid. What would you recommend?", InquiryDataset.recommendation]],
+                         ["I'm looking for a ball for my kid. What would you recommend?",
+                          InquiryDataset.recommendation]],
 
                         )
+
+    @staticmethod
+    def save(dataset):
+        pd.DataFrame(dataset).to_csv(InquiryDataset.dataset_path)
