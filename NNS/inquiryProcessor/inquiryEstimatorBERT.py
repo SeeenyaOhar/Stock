@@ -12,7 +12,6 @@ from official.nlp import optimization  # to create AdamW optimizer
 from NNS.inquiryProcessor.dataset import InquiryDataset
 import NNS.inquiryProcessor.inquiryEstimator
 import matplotlib.pyplot as plt
-    
 
 class InquiryAnalyzerBERTModel(keras.Model):
 

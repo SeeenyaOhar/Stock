@@ -8,7 +8,7 @@ sys.path.append("D:\\Documents\\Code\\Stock")
 from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer
 from NNS.inquiryProcessor.inquiryEstimatorBERT import InquiryAnalyzerBERT, InquiryAnalyzerBERTModel, \
     InquiryAnalyzerDatasetManagerBERT
-from flask import Flask, request
+import flask
 from typing import Tuple
 import os
 

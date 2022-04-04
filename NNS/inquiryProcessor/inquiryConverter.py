@@ -2,8 +2,6 @@
 import spacy
 import numpy as np
 from NNS.inquiryProcessor.contractions import ContractionsJSON
-
-
 def cleanUpTheInquiry(inquiry: str):
     """Cleans the inqury from some redundant characters(,.!? and so on)
 
