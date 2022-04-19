@@ -6,9 +6,9 @@ import requests
 import sys
 sys.path.append("D:\\Documents\\Code\\Stock")
 from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer
-from NNS.inquiryProcessor.inquiryEstimatorBERT import InquiryAnalyzerBERT, InquiryAnalyzerBERTModel, \
+from NNS.inquiryProcessor.BERT.inquiryEstimatorBERT import InquiryAnalyzerBERT, InquiryAnalyzerBERTModel, \
     InquiryAnalyzerDatasetManagerBERT
-import flask
+from flask import Flask, request
 from typing import Tuple
 import os
 
@@ -54,13 +54,19 @@ def get_analyzer(type_of_analyzer: str):
     """
     if type_of_analyzer == 'bert':
         print("LOADING BERT CLASSIFICATION MODEL...")
-        bert_model = InquiryAnalyzerBERT.get_model_from_file(str(sys.argv[1]),
-                                                             InquiryAnalyzerDatasetManagerBERT.get_ds(
-                                                                 64, sys.argv[2]),
-                                                             epochs=1000)
-        print("BERT MODEL HAS BEEN LOADED SUCCESSFULLY")
-        message_classifier = InquiryAnalyzerBERT(bert_model)
-        return message_classifier
+        try:
+            
+            bert_model = InquiryAnalyzerBERT.get_model_from_file(str(sys.argv[1]),
+                                                                InquiryAnalyzerDatasetManagerBERT.get_ds(
+                                                                    64, sys.argv[2]),
+                                                                epochs=1000)
+            print("BERT MODEL HAS BEEN LOADED SUCCESSFULLY")
+            message_classifier = InquiryAnalyzerBERT(bert_model)
+            return message_classifier
+        
+        except IndexError as e:
+            print(e, "\nBERT Model is invalid. Try correcting it and try later.")
+            os.abort()
     else:
         return None
 
