@@ -4,6 +4,7 @@ from bot_configuration import BotConfiguration, MessagePack
 import numpy
 import requests
 import sys
+from stockBotMessenger.telegram_bot_info import TelegramBotInfo
 sys.path.append("D:\\Documents\\Code\\Stock")
 from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer
 from NNS.inquiryProcessor.BERT.inquiryEstimatorBERT import InquiryAnalyzerBERT, InquiryAnalyzerBERTModel, \
@@ -11,11 +12,8 @@ from NNS.inquiryProcessor.BERT.inquiryEstimatorBERT import InquiryAnalyzerBERT, 
 from flask import Flask, request
 from typing import Tuple
 import os
-
-
-
+request_url = "https://api.telegram.org/bot{0}/{1}"
 stock = Flask(__name__)
-
 
 def get_message_pack(phone_number: phonenumbers.PhoneNumber, email: str) -> list:
     user_interaction_needed = "Hey, we're going to process your message soon and text you back. Thank you for waiting."
@@ -33,11 +31,7 @@ def get_message_pack(phone_number: phonenumbers.PhoneNumber, email: str) -> list
     return [user_interaction_needed, contact, dataset_search, delivery, order, welcome, feedback, checkout,
             checkout_request, recommendation]
 
-
-telegram_bot_info = {
-    "token": "5277508536:AAGDFgz6X7zropxTDL-8AmaK7Vmk1ambIF4", "name": "stock_store_bot"}
-request_url = "https://api.telegram.org/bot{0}/{1}"
-
+telegram_bot_info = TelegramBotInfo("stock_store_bot", "5277508536:AAGDFgz6X7zropxTDL-8AmaK7Vmk1ambIF4")
 phone_number = phonenumbers.parse("+380987669293")
 email = "arseniyohar@gmail.com"
 message_pack = MessagePack(get_message_pack(phone_number, email))
@@ -56,7 +50,7 @@ def get_analyzer(type_of_analyzer: str):
         print("LOADING BERT CLASSIFICATION MODEL...")
         try:
             
-            bert_model = InquiryAnalyzerBERT.get_model_from_file(str(sys.argv[1]),
+            bert_model = InquiryAnalyzerBERTModel.from_file(str(sys.argv[1]),
                                                                 InquiryAnalyzerDatasetManagerBERT.get_ds(
                                                                     64, sys.argv[2]),
                                                                 epochs=1000)
@@ -75,7 +69,7 @@ def send_classification(classification: Tuple[str, numpy.ndarray], chat_id, user
     # TODO: add a bot configuration to the backend
     helper = MessageHelper(bot_configuration)  # <------------------
     message = helper.answer(user_message, classification[1])
-    url = request_url.format(telegram_bot_info["token"], "sendMessage")
+    url = request_url.format(telegram_bot_info.token, "sendMessage")
     data = {"chat_id": chat_id, "text": message}
     requests.post(url, data=data)
 
@@ -92,7 +86,7 @@ def process_message():
         if message[0] == "/":
             if message == "/start" or message == "/help":
                 url = request_url.format(
-                    telegram_bot_info["token"], "sendMessage")
+                    telegram_bot_info.token, "sendMessage")
                 requests.post(url, data={
                     "text": "Welcome to the club buddy!\n"
                             "Here you can write a message that you would text to the store and we will "
@@ -110,3 +104,6 @@ if __name__ == '__main__':
     analyzer = get_analyzer("bert")
     print(analyzer)
     stock.run()
+
+
+

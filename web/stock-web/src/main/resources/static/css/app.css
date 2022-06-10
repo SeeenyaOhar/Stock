@@ -1,0 +1,102 @@
+body{
+    margin:0;
+}
+.guide{
+    background: #D3EFBD;
+    padding: 25px;
+    text-align: center;
+    font-size:18px;
+}
+.messages{
+
+}
+.clientMessage{
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px;
+}
+.clientMessageText{
+    display:flex;
+    background: #2E3532;
+    color: white;
+    opacity: 70%;
+    padding: 15px;
+}
+.clientMessageIcon{
+    padding-right:30px;
+    width:30px;
+}
+.serverMessage{
+    display:flex;
+    justify-content: flex-start;
+    margin: 10px;
+}
+.serverMessageText{
+    display:flex;
+    background: #2E3532;
+    color: white;
+    opacity: 70%;
+    padding: 15px;
+}
+.serverMessageIcon{
+    padding-right:30px;
+    width:40px;
+}
+.newMessageForm{
+    display: flex;
+    justify-content: space-between;
+}
+.newMessage{
+    width:100%;
+    background: #D9D9D9;
+    padding: 15px;
+}
+.newMessageSubmit{
+    background: #8B2635;
+    color: white;
+    padding: 10px;
+}
+.flex{
+    display:flex;
+}
+.even{
+    justify-content: space-evenly;
+}
+.tryIt{
+    margin-top: auto;
+    margin-bottom: auto;
+    padding: 10px;
+    background: #8B2635;
+    color: white;
+}
+.center{
+    text-align:center;
+}
+.vl {
+    size: 10px;
+    width:1px;
+    background:black;
+    border-color: black;
+    margin-left:10px;
+    margin-right:10px;
+}
+.header{
+    background: #D2D4C8;
+    margin: 0;
+    border-color: #D2D4C8;
+}
+.sample{
+    background: #E0E2DB;
+    padding: 10px;
+}
+.footerTryItNow{
+    display:flex;
+    justify-content: space-evenly;
+}
+.messageBr{
+    size: 5px;
+    width:1px;
+    background:white;
+    border-color: white;
+    margin: 10px;
+}

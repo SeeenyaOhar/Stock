@@ -1,8 +1,11 @@
 import numpy as np
-import csv as csv
 import pandas as pd
 import os
 import sys
+currentdir = os.path.dirname(__file__)
+parentdir = os.path.dirname(currentdir) # NNS\inquiryProcessor
+sys.path.append(parentdir)
+from services.pandas import PandasService
 class InquiryDataset:
     """
     Manages the training datasets.
@@ -32,31 +35,18 @@ class InquiryDataset:
         print(dataset_path)
         df = pd.read_csv(dataset_path, error_bad_lines=False)
         dataset = df.to_numpy()
-        dataset = dataset[:, [1, 2]] # in the file we have also ids in zero column, so let's select only labels
-        # and inquiries
+         # in the file we have also ids in zero column, so let's select only labels and inquiries
+        dataset = dataset[:, [1, 2]]
         classes = dataset[:, 1]
         for i, el in enumerate(classes):
-            classes[i] = InquiryDataset.pandas_csv_real_to_string(el)
+            classes[i] = PandasService.pandasAr_tonumpyAr(el)
         return dataset
 
-    @staticmethod
-    def pandas_csv_real_to_string(a: str) -> np.ndarray:
-        """
-        Pandas numpy array is a string. To convert to numpy array we use this method.
-        Converts '[1 0 1 0 0 0 0 0 0]' to 'array([[1, 0, 1, 0, 0, 0, 0, 0, 0]]'
-        :param a: csv string
-        :return: np.ndarray
-        """
-
-        b = a.split('[')[1].split(']')[0].split(' ')
-        c = np.zeros([1, len(b)])
-        for i, el in enumerate(b):
-            c[0, i] = int(el)
-        return c
 
     @staticmethod
     def get_temp_dataset() -> np.ndarray:
         """
+        DEPRECATED
                 Returns a training dataset [*, 2] that contains inquiries and classifications respectively.
                 :return: Returns a numpy array [*, 2] with inquiries and classifications
                 """
@@ -240,15 +230,15 @@ class InquiryDataset:
                           InquiryDataset.recommendation],
                          ["Hi, I would like to buy the new Iphone 12, please. Cash, 51 Queen Street"
                           "HEREFORD"
-                          "HR7 2FZ", InquiryDataset.checkout],
+                          "HR7 2FZ", InquiryDataset.checkoutRequest],
                          ["Hi, can I pay with cash when I get the package?",
                           InquiryDataset.checkoutRequest],
                          ["Hey, do I have to pay with credit card only?",
-                          InquiryDataset.checkoutRequest],
+                          InquiryDataset.checkout],
                          ["Hi, do you accept Master Cards?",
                           InquiryDataset.checkout],
                          ["Hello, do I have to prepay for something when ordering a book?",
-                          InquiryDataset.checkoutRequest],
+                          InquiryDataset.checkout],
                          ["What're the ways to pay for the package?",
                           InquiryDataset.checkoutRequest],
                          ["Hi, I want to buy the new Corsar fireworks? How much do they cost?",
@@ -272,7 +262,7 @@ class InquiryDataset:
                          ["Thanks a lot. Got a package and everything is great, the quality's above the sky!",
                           InquiryDataset.feedback],
                          [
-                             "Everythign is awesome! The book itself is interesting and breathtaking. The delivery didn't take long. 5 stars",
+                             "Everything is awesome! The book itself is interesting and breathtaking. The delivery didn't take long. 5 stars",
                              InquiryDataset.feedback],
                          ["Thanks a lot. I'm over the moon!",
                           InquiryDataset.feedback],
@@ -513,3 +503,6 @@ class InquiryDataset:
     @staticmethod
     def save(dataset):
         pd.DataFrame(dataset).to_csv(InquiryDataset.dataset_path)
+
+if __name__ == "__main__":
+    print(InquiryDataset.get_training_dataset("D:\\documents\\code\\Stock\\NNS\\inquiryProcessor\\inquiries_dataset.csv"))

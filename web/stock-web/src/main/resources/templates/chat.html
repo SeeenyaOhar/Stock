@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock - chat page</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div class="guide"><b>Welcome to the chat page!</b> <br>
+    Imagine you have stumbled upon a store page, and you would like to buy a product. <br>
+    For example, you came across a sneakers store page. And you saw new Nike Air, let it be Nike Air LeBron Edition.
+    <br>
+    They’re awesome. But you are from Ukraine, and you would like to find out if you can deliver them to Ukraine. <br>
+    Make up a message that can find out the answer to your question!
+</div>
+<div class="messages">
+    <div th:each="message : ${messages}" class="message">
+
+        <div th:if="${message.getSender() == T(com.senyastr.stockweb.models.Sender).CLIENT}" class="clientMessage">
+
+                <div class="clientMessageText">
+                    <img th:src="@{/images/person.svg}" class="clientMessageIcon"/>
+                    <hr class="messageBr"/>
+                    <p th:text="${message.getMessage()}"></p>
+                </div>
+
+        </div>
+        <div th:if="${message.getSender() == T(com.senyastr.stockweb.models.Sender).SERVER}" class="serverMessage">
+            <div class="serverMessageText">
+                <img th:src="@{/images/robot.svg}" class="serverMessageIcon"/>
+                <hr class="messageBr"/>
+                <p th:text="${message.getMessage()}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form action="#" th:action="@{/chat}" th:object="${newMessage}" method="post" class="newMessageForm">
+    <input class="newMessage" type="text" id="messageBox" th:field="*{message}" placeholder="Type a message"/>
+    <input class="newMessageSubmit" type="submit" id="submitButton" value="Send"/>
+</form>
+</body>
+</html>

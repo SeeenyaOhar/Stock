@@ -1,4 +1,5 @@
-"""This module adds the contractions for inquiry processing for InquiryConverter module.
+"""
+This module adds the contractions for inquiry processing for InquiryConverter module.
 """
 from contractions import ContractionsJSON
 if __name__ == '__main__':

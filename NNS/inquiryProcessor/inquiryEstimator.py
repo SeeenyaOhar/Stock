@@ -1,11 +1,47 @@
 import numpy as np
+from abc import ABC
 from typing import Tuple
-class InquiryAnalyzer:
-    def classify(self, inquiries: list) -> Tuple[str, np.ndarray]:
+class ClassificationConverter(ABC):
+    def convert(self, a: np.ndarray) -> str:
         pass
+class StringClassificationConverter():
+    def convert(self,a: np.ndarray) -> str:
+        if a[4] == 1:
+            result = "ORDER"
+        if a[2] == 1:
+            result = "SEARCH"
+        if a[3] == 1:
+            result = "DELIVERY"
+        if a[7] == 1:
+            result = "CHECKOUT"
+        if a[0] == 1:
+            result = "USER INTERACTION NEEDED"
+        if a[1] == 1:
+            result = "CONTACT"
+        if a[8] == 1:
+            result = "REQUEST"
+        if a[6] == 1:
+            result = "FEEDBACK"
+        if a[5] == 1:
+            result = "WELCOME"
+        if a[9] == 1:
+            result = "RECOMMENDATION"
+        return result
+class NumberClassificationConverter:
+    def convert(self, a: np.ndarray) -> str:
+        result = 0
+        for i in range(a.shape[0]):
+            if a[i] == 1:
+                result = i
+                break
+        return str(result)
 class InquiryAnalyzerAssistant:
+    
     @staticmethod
-    def classifierstring(a: np.ndarray):
+    def classifierstring(a: np.ndarray, cc=NumberClassificationConverter()):
+        return cc.convert(a)
+    @staticmethod
+    def classifierstringar(a: np.ndarray, cc=NumberClassificationConverter()):
         """Returns a string representation of the (1, 10) array according to these labels:
         1. user_interaction_needed = np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         2. contact = np.array([0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -27,24 +63,5 @@ class InquiryAnalyzerAssistant:
         """
         result = ["" for i in a]
         for i, el in enumerate(a):
-            if a[i, 4] == 1:
-                result[i] += "ORDER "
-            if a[i, 2] == 1:
-                result[i] += "SEARCH "
-            if a[i, 3] == 1:
-                result[i] += "DELIVERY "
-            if a[i, 7] == 1:
-                result[i] += "CHECKOUT "
-            if a[i, 0] == 1:
-                result[i] += "USER INTERACTION NEEDED"
-            if a[i, 1] == 1:
-                result[i] += "CONTACT"
-            if a[i, 8] == 1:
-                result[i] += "REQUEST "
-            if a[i, 6] == 1:
-                result[i] += "FEEDBACK "
-            if a[i, 5] == 1:
-                result[i] += "WELCOME "
-            if a[i, 9] == 1:
-                result[i] += "RECOMMENDATION "
+            result[i] = cc.convert(el)
         return result

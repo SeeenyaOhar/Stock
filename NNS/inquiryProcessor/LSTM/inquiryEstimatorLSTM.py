@@ -10,6 +10,7 @@ from typing import Tuple
 from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer, InquiryAnalyzerAssistant
 from NNS.inquiryProcessor.inquiryConverter import InquiryArrayConverter
 import inquiryEstimator
+from NNS.inquiryProcessor.inquiry_analyzer_abs import InquiryAnalyzer
 # UI
 
 import curses as curses
@@ -223,13 +224,16 @@ class InquiryAnalyzerLSTM(nn.Module, InquiryAnalyzer):
     def convert(self, inq):
         converter = InquiryArrayConverter(inq)
         return converter.convertToNumpyNumbers()
-    def classify(self, inquries: list) -> Tuple[str, np.ndarray]:
+    def classify(self, inquries: list or str) -> Tuple[str, np.ndarray]:
         # TODO: HAS NOT BEEN DEBUGGED AND TESTED
+        if type(inquries) is str:
+            # just put in the list and forward
+            inquiries = [inquiries] 
         super.classify(inquries)
         testV = self.convert(list)
         testTensor = self.packSequence(testV)
         result = self.forward(testTensor).round().numpy
-        return InquiryAnalyzerAssistant.classifierstring(result), result
+        return InquiryAnalyzerAssistant.classifierstringar(result), result
         
 class InquiryAnalyzerSVM(nn.Module):
     def __init__(self):
