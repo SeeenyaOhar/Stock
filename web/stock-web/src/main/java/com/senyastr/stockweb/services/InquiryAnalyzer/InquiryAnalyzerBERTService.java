@@ -12,23 +12,32 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class InquiryAnalyzerBERTService implements InquiryAnalyzerService {
     private final RestTemplate restTemplate = new RestTemplate();
+    private final String API_URL = "http://127.0.0.1:5000";
+    private final String ANALYZE_ENDPOINT = "/class_message";
+
     @Override
     public InquirySummary analyzeInquiry(String message) {
-        String API_URL = "http://127.0.0.1:5000";
-        String ANALYZE_ENDPOINT = "/class_message";
+        // api example https://github.com/SeeenyaOhar/Stock
         try {
             JSONObject messageJsonObject = new JSONObject();
             messageJsonObject.put("message", message);
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> request = new HttpEntity<String>(messageJsonObject.toString(), headers);
+
             String result = restTemplate.postForObject(API_URL + ANALYZE_ENDPOINT, request, String.class);
             assert result != null;
+
             return new InquirySummary(Integer.parseInt(result));
-        } catch (NumberFormatException e) {
+        }
+
+        catch (NumberFormatException e) {
             System.out.println("Number format exception.\nResponse body from Inquiry Analyzer is broken!\n" + e);
             return new InquirySummary(MessageClass.USER_INTERACTION_NEEDED.ordinal());
-        } catch (JSONException jsonE) {
+        }
+
+        catch (JSONException jsonE) {
             System.out.println("Some problems with JSON in InquiryBERTService\n" + jsonE);
             return new InquirySummary(MessageClass.USER_INTERACTION_NEEDED.ordinal());
         }

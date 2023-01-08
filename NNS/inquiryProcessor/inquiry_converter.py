@@ -2,8 +2,10 @@
 import spacy
 import numpy as np
 from NNS.inquiryProcessor.contractions import ContractionsJSON
-def cleanUpTheInquiry(inquiry: str):
-    """Cleans the inqury from some redundant characters(,.!? and so on)
+
+
+def clean_up(inquiry: str):
+    """Cleans the inquiry from some redundant characters(,.!? and so on)
 
     Args:
         inquiry (str): The inquiry.
@@ -12,31 +14,31 @@ def cleanUpTheInquiry(inquiry: str):
         (str): The cleaned inquiry.
     """
     inquiry = inquiry.lower()
-    inquiry = cleanCharacters(inquiry)
-    inquiry = cleanContractions(inquiry)
+    inquiry = clean_chars(inquiry)
+    inquiry = clean_contractions(inquiry)
     return inquiry
 
 
-def cleanCharacters(inquiry):
+def clean_chars(inquiry):
     """
     Removes special symbols that are not valuable to the spacy embeddings.
     :param inquiry:
     :return:
     """
-    removeCharacters = [".", ",", "+", "-", "=", ":", "-", "?", "!", '"']
-    for i in removeCharacters:
+    remove_characters = [".", ",", "+", "-", "=", ":", "-", "?", "!", '"']
+    for i in remove_characters:
         inquiry = inquiry.replace(i, "")
     return inquiry
 
 
-def cleanContractions(inquiry):
+def clean_contractions(inquiry):
     """
     Cleans up the contractions("what's up", "rofl")
     :param inquiry:
     :return:
     """
     contractions = ContractionsJSON()
-    contractions.initDictionary()
+    contractions.init_dictionary()
 
     for contraction in contractions.dictionary:
         if contraction in inquiry:
@@ -54,18 +56,18 @@ class InquiryConverter:
 
     def __init__(self, inquiry, language="en"):
         if InquiryConverter._dictionary is None:
-            InquiryConverter._dictionary = WordsDictionary.getWordsDictionary(
+            InquiryConverter._dictionary = WordsDictionary.get_words_dictionary(
                 language)
         self.data = inquiry
         self.words = inquiry.split(" ")
 
-    def convertTonpArray(self) -> np.array:
-        inq = cleanUpTheInquiry(self.data)
+    def convert_to_np(self) -> np.array:
+        inq = clean_up(self.data)
         self.words = inq.split(" ")
         arrays = np.zeros((len(self.words), 300), dtype=np.double)
         i = 0
         for curWord in self.words:
-            word = cleanUpTheInquiry(curWord)
+            word = clean_up(curWord)
             array = np.array(InquiryConverter._dictionary.vocab[word].vector)
             arrays[i] = array.astype(dtype=np.double)
             i += 1
@@ -83,45 +85,44 @@ class InquiryArrayConverter:
         self.inquiries = inquiries
         self.language = language
         if InquiryArrayConverter._dictionary is None:
-            InquiryArrayConverter._dictionary = WordsDictionary.getWordsDictionary(
+            InquiryArrayConverter._dictionary = WordsDictionary.get_words_dictionary(
                 self.language)
 
-    def convertToNumpyNumbers(self):
+    def convert_to_npn(self):
         # So we have an array of inquiries
         # Each one has words
         # And each word has to be converted into numpy numbers
         result = []
 
         for i in self.inquiries:
-            inq = cleanUpTheInquiry(i)
+            inq = clean_up(i)
             words = inq.split(" ")
 
-            wordsNumpyArray = np.zeros((len(words), 300), dtype=np.double)
+            words_numpy_array = np.zeros((len(words), 300), dtype=np.double)
             i = 0
             for curWord in words:
-                word = cleanUpTheInquiry(curWord)
+                word = clean_up(curWord)
                 array = np.array(
                     InquiryArrayConverter._dictionary.vocab[word].vector)
-                wordsNumpyArray[i] = array.astype(dtype=np.double)
+                words_numpy_array[i] = array.astype(dtype=np.double)
                 i += 1
-            result.append(wordsNumpyArray)
+            result.append(words_numpy_array)
         return result
-
-
 
 
 class WordsDictionary:
     """
     Manages dictionaries for creating embeddings from spacy library.
     """
+
     @staticmethod
-    def getWordsDictionary(language="en"):
-        packageName = ""
+    def get_words_dictionary(language="en"):
+        package_name = ""
         # English
         if language == "en":
-            packageName = "en_core_web_lg" # we use a large package for the most precision
+            package_name = "en_core_web_lg"  # we use a large package for the most precision
 
-        if packageName == "":
+        if package_name == "":
             raise ValueError("Language as such was not found.")
         else:
-            return spacy.load(packageName)
+            return spacy.load(package_name)

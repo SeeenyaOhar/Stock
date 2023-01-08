@@ -2,10 +2,13 @@ import numpy as np
 import pandas as pd
 import os
 import sys
+
 currentdir = os.path.dirname(__file__)
-parentdir = os.path.dirname(currentdir) # NNS\inquiryProcessor
+parentdir = os.path.dirname(currentdir)  # NNS\inquiryProcessor
 sys.path.append(parentdir)
-from services.pandas import PandasService
+from ...services.pandas import PandasService
+
+
 class InquiryDataset:
     """
     Manages the training datasets.
@@ -35,13 +38,12 @@ class InquiryDataset:
         print(dataset_path)
         df = pd.read_csv(dataset_path, error_bad_lines=False)
         dataset = df.to_numpy()
-         # in the file we have also ids in zero column, so let's select only labels and inquiries
+        # in the file we have also ids in zero column, so let's select only labels and inquiries
         dataset = dataset[:, [1, 2]]
         classes = dataset[:, 1]
         for i, el in enumerate(classes):
             classes[i] = PandasService.pandasAr_tonumpyAr(el)
         return dataset
-
 
     @staticmethod
     def get_temp_dataset() -> np.ndarray:
@@ -504,5 +506,7 @@ class InquiryDataset:
     def save(dataset):
         pd.DataFrame(dataset).to_csv(InquiryDataset.dataset_path)
 
+
 if __name__ == "__main__":
-    print(InquiryDataset.get_training_dataset("D:\\documents\\code\\Stock\\NNS\\inquiryProcessor\\inquiries_dataset.csv"))
+    print(
+        InquiryDataset.get_training_dataset("D:\\documents\\code\\Stock\\NNS\\inquiryProcessor\\inquiries_dataset.csv"))

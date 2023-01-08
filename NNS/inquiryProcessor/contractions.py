@@ -15,7 +15,7 @@ class ContractionsJSON:
         replacement = self.dictionary.pop(contraction)
         return replacement
 
-    def initDictionary(self):
+    def init_dictionary(self):
         try:
             with open(self.path, "rt") as i:
                 data = i.read()
@@ -24,7 +24,7 @@ class ContractionsJSON:
         except IOError as ioe:
             print(str(ioe))
 
-    def saveJSON(self):
+    def save_json(self):
         try:
             with open(self.path, "wt") as i:
                 data = json.dumps(self.dictionary)

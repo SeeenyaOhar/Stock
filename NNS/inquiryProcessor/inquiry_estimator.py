@@ -1,11 +1,14 @@
 import numpy as np
 from abc import ABC
-from typing import Tuple
+
+
 class ClassificationConverter(ABC):
     def convert(self, a: np.ndarray) -> str:
         pass
-class StringClassificationConverter():
-    def convert(self,a: np.ndarray) -> str:
+
+
+class StringClassificationConverter:
+    def convert(self, a: np.ndarray) -> str:
         if a[4] == 1:
             result = "ORDER"
         if a[2] == 1:
@@ -27,6 +30,8 @@ class StringClassificationConverter():
         if a[9] == 1:
             result = "RECOMMENDATION"
         return result
+
+
 class NumberClassificationConverter:
     def convert(self, a: np.ndarray) -> str:
         result = 0
@@ -34,12 +39,16 @@ class NumberClassificationConverter:
             if a[i] == 1:
                 result = i
                 break
+
         return str(result)
+
+
 class InquiryAnalyzerAssistant:
-    
+
     @staticmethod
     def classifierstring(a: np.ndarray, cc=NumberClassificationConverter()):
         return cc.convert(a)
+
     @staticmethod
     def classifierstringar(a: np.ndarray, cc=NumberClassificationConverter()):
         """Returns a string representation of the (1, 10) array according to these labels:

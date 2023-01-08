@@ -1,10 +1,8 @@
-import os
 import torch
-import torch.nn.utils.rnn as utils
 import numpy as np
-from NNS.inquiryProcessor.inquiryConverter import InquiryConverter, InquiryArrayConverter
-from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzerRNN
-from NNS.inquiryProcessor.dataset import InquiryDataset
+from NNS.inquiryProcessor.inquiry_converter import InquiryArrayConverter
+from NNS.inquiryProcessor.inquiry_estimator import InquiryAnalyzerRNN
+from NNS.inquiryProcessor.dataset.dataset import InquiryDataset
 ANAL_WEIGHTS_FILEPATH = "C:\\Users\\User\\mmm.weights"
 
 def labelsNumpy(array):
@@ -28,7 +26,7 @@ def train(anal, epochs=1000):
     # splitting data and converting to a right form
     training_dataset = np_training_dataset
     training_input = anal.packSequence(InquiryArrayConverter(np_training_dataset[:, 0],
-                                                             language="en").convertToNumpyNumbers())
+                                                             language="en").convert_to_npn())
     # getting the first axis which is the input
     np_labels = labelsNumpy(np_training_dataset[:, 1])
     # getting the second axis(the labels for the input given)
@@ -49,7 +47,7 @@ def test(anal):
     y = np_training_dataset[0:3, 1].tolist() + np_training_dataset[-3:-1, 1].tolist() + [np_training_dataset[-1, 1]]
     training_input = anal.packSequence(
         InquiryArrayConverter(sample,
-                              language="en").convertToNumpyNumbers())
+                              language="en").convert_to_npn())
     anal.eval()
     result = str(anal.forward(training_input, cellStateSize=len(
         training_input.sorted_indices)).round())

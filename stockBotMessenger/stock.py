@@ -6,7 +6,7 @@ import requests
 import sys
 from stockBotMessenger.telegram_bot_info import TelegramBotInfo
 sys.path.append("D:\\Documents\\Code\\Stock")
-from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer
+from NNS.inquiryProcessor.inquiry_estimator import InquiryAnalyzer
 from NNS.inquiryProcessor.BERT.inquiryEstimatorBERT import InquiryAnalyzerBERT, InquiryAnalyzerBERTModel, \
     InquiryAnalyzerDatasetManagerBERT
 from flask import Flask, request

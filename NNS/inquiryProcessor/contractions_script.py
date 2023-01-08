@@ -5,7 +5,7 @@ from contractions import ContractionsJSON
 if __name__ == '__main__':
     print("The form is: \n [contraction];replacement")
     contractions = ContractionsJSON()
-    contractions.initDictionary()
+    contractions.init_dictionary()
     print(contractions.path)
     while True:
         try:
@@ -13,7 +13,7 @@ if __name__ == '__main__':
             b = a.split(";")
             contraction, replacement = b[0], b[1]
             contractions.add(contraction, replacement)
-            contractions.saveJSON()
+            contractions.save_json()
 
         except Exception as e:
             print(e)

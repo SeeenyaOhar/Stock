@@ -7,8 +7,8 @@ import torch.nn.utils.rnn as utils
 import numpy as np
 import time
 from typing import Tuple
-from NNS.inquiryProcessor.inquiryEstimator import InquiryAnalyzer, InquiryAnalyzerAssistant
-from NNS.inquiryProcessor.inquiryConverter import InquiryArrayConverter
+from NNS.inquiryProcessor.inquiry_estimator import InquiryAnalyzer, InquiryAnalyzerAssistant
+from NNS.inquiryProcessor.inquiry_converter import InquiryArrayConverter
 import inquiryEstimator
 from NNS.inquiryProcessor.inquiry_analyzer_abs import InquiryAnalyzer
 # UI
@@ -223,7 +223,7 @@ class InquiryAnalyzerLSTM(nn.Module, InquiryAnalyzer):
             
     def convert(self, inq):
         converter = InquiryArrayConverter(inq)
-        return converter.convertToNumpyNumbers()
+        return converter.convert_to_npn()
     def classify(self, inquries: list or str) -> Tuple[str, np.ndarray]:
         # TODO: HAS NOT BEEN DEBUGGED AND TESTED
         if type(inquries) is str:

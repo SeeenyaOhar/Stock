@@ -1,0 +1,6 @@
+{
+    "inquiry_analyzer": "D:\\documents\\code\\Stock\\NNS\\inquiryProcessor\\BERT\\InquiryEstimatorBERT_Model",
+    "feedback_analyzer": "D:\\documents\\code\\Stock\\NNS\\feedback_classifier\\BERT\\feedback_model",
+    "dataset_searcher": null,
+    "inquiry_analyzer_ds": "D:\\documents\\code\\Stock\\NNS\\inquiryProcessor\\inquiries_dataset.csv"
+}
