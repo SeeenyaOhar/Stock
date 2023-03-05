@@ -1,5 +1,6 @@
 **/__pycache__/**
 NNS/inquiryProcessor/.pytest_cache/**
-NNS/inquiryProcessor/InquiryEstimatorBERT_Model/**
+NNS/inquiryProcessor/BERT/InquiryEstimatorBERT_Model/**
 **/.vscode/**
 **/.idea/**
+**/stockBotMessenger/__pycache__
