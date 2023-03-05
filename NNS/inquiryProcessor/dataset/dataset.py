@@ -5,8 +5,9 @@ import sys
 
 currentdir = os.path.dirname(__file__)
 parentdir = os.path.dirname(currentdir)  # NNS\inquiryProcessor
+
 sys.path.append(parentdir)
-from ...services.pandas import PandasService
+from NNS.services.pandas import PandasService
 
 
 class InquiryDataset:
